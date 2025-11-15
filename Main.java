@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    static void runningInCMD(){
         WordSearchNode root = new WordSearchNode();
         WordSearchFunctions trie = new WordSearchFunctions(root);
         Scanner sc = new Scanner(System.in);
@@ -31,6 +31,8 @@ public class Main {
         if(answer.equals("yes") || answer.equals("Yes")){
             System.out.println("Enter the number of the word that matched (1-5)");
             int num = sc.nextInt();
+            sc.nextLine();//Clears the next line
+
             WordSearchNode node = WordSearchFunctions.searchingSubstring(root, substring);
             if(node != null) {
                 node.freqArray[num - 1] += 1;
@@ -39,7 +41,6 @@ public class Main {
         }
         else{
             System.out.println("Okay! What was the word that you were typing? ");
-            sc.nextLine();
             String fullWord = sc.nextLine();
             WordSearchNode node = WordSearchFunctions.searchingSubstring(root, substring);
             int index = 0;
@@ -56,6 +57,16 @@ public class Main {
                 System.out.println("Okay! Library has been updated according to your preference");
             }
         }
-
+        System.out.println("Do you want to check for another word?(yes/no)");
+        String output = sc.nextLine();
+        if(output.equalsIgnoreCase("yes")){
+            runningInCMD();
+        }
+        else{
+            System.out.println("Ok! Exiting");
+        }
+    }
+    public static void main(String[] args) {
+        runningInCMD();
     }
 }
