@@ -1,18 +1,9 @@
 import java.util.Scanner;
 
 public class Main {
-    static void runningInCMD(){
-        WordSearchNode root = new WordSearchNode();
-        WordSearchFunctions trie = new WordSearchFunctions(root);
+    static void runningInCMD(WordSearchNode root){
         Scanner sc = new Scanner(System.in);
-
-//for setting up the trie
-        String filePath1 = "C:\\Users\\shrey\\Downloads\\file with words.csv";
-        WordSearchFunctions.readWordsFromFile1(root, filePath1);
-        String filePath2 = "C:\\Users\\shrey\\Downloads\\file with substring suggestions.csv";
-        WordSearchFunctions.readSuggestionsFromFile2(root, filePath2);
-
-//for accessing the elements of the trie
+        //for accessing the elements of the trie
         System.out.println("Enter the substring you want suggestions for: ");
         String substring = sc.nextLine();
         String[] suggestedWords = WordSearchFunctions.getSuggestions(root, substring);
@@ -47,6 +38,10 @@ public class Main {
             if(node != null) {
                 int least = node.freqArray[0];
                 for (int i = 0; i < 5; i++) {
+                    if(least == 0){
+                        index = i;
+                        break;
+                    }
                     if (node.freqArray[i] < least) {
                         least = node.freqArray[i];
                         index = i;
@@ -60,13 +55,20 @@ public class Main {
         System.out.println("Do you want to check for another word?(yes/no)");
         String output = sc.nextLine();
         if(output.equalsIgnoreCase("yes")){
-            runningInCMD();
+            runningInCMD(root);
         }
         else{
             System.out.println("Ok! Exiting");
         }
     }
     public static void main(String[] args) {
-        runningInCMD();
+        WordSearchNode root = new WordSearchNode();
+        WordSearchFunctions trie = new WordSearchFunctions(root);
+        //for setting up the trie
+        String filePath1 = "C:\\Users\\shrey\\Downloads\\file with words.csv";
+        WordSearchFunctions.readWordsFromFile1(root, filePath1);
+        String filePath2 = "C:\\Users\\shrey\\Downloads\\file with substring suggestions.csv";
+        WordSearchFunctions.readSuggestionsFromFile2(root, filePath2);
+        runningInCMD(root);
     }
 }
