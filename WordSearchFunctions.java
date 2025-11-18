@@ -51,6 +51,25 @@ public class WordSearchFunctions {
         return lastNode.suggestions;
     }
 
+    public static WordSearchNode createSubstringNode(WordSearchNode root, String substring) {
+        WordSearchNode current = root;
+
+        for (char c : substring.toCharArray()) {
+
+            int index = c - 'a';
+
+            // If missing → create new node
+            if (current.children[index] == null) {
+                current.children[index] = new WordSearchNode();
+            }
+
+            current = current.children[index];
+        }
+
+        return current; // final node for substring
+    }
+
+
     public static void readWordsFromFile1(WordSearchNode root, String filePath1){
         try(BufferedReader br = new BufferedReader(new FileReader(filePath1))){
             String word;
@@ -90,5 +109,7 @@ public class WordSearchFunctions {
             e.printStackTrace();
         }
     }
+
+
 }
 

@@ -5,6 +5,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
+
 public class Main extends Application {
 
     private WordSearchNode root;
@@ -38,8 +40,7 @@ public class Main extends Application {
         updateButton = new Button("Add to Library");
         updateButton.getStyleClass().add("update-button");
         updateButton.setVisible(false);
-
-        // INPUT LISTENER
+        
         input.textProperty().addListener((obs, oldText, newText) -> {
 
             fullTypedWord = newText.trim().toLowerCase();
@@ -87,35 +88,55 @@ public class Main extends Application {
             messageLabel.setVisible(true);
         });
 
-        // UPDATE BUTTON HANDLER
         updateButton.setOnAction(e -> {
 
-            String prefix = currentPrefix;
-            String newWord = fullTypedWord;
+            String fullWord = input.getText().toLowerCase();
+            StringBuilder substring = new StringBuilder();
 
-            if (newWord.isEmpty()) return;
+            for (int i = 0; i < fullWord.length(); i++) {
 
-            WordSearchNode node = WordSearchFunctions.searchingSubstring(root, prefix);
+                substring.append(fullWord.charAt(i));
+                if (substring.length() < 2)
+                    continue;
 
-            if (node == null) {
-                WordSearchFunctions.insertingNodeInTrie(root, prefix);
-                node = WordSearchFunctions.searchingSubstring(root, prefix);
-                node.suggestions = new String[]{"", "", "", "", ""};
-                node.freqArray = new int[]{0, 0, 0, 0, 0};
-            }
+                String sub = substring.toString();
+                WordSearchNode node = WordSearchFunctions.createSubstringNode(root, sub);
+                if (node == null)
+                    continue;
+                String[] current = WordSearchFunctions.getSuggestions(root, sub);
+                if (current == null)
+                    current = new String[5];
+                String[] updated = Arrays.copyOf(current, current.length);
 
-            int minIndex = 0;
-            int minVal = node.freqArray[0];
-
-            for (int i = 1; i < 5; i++) {
-                if (node.freqArray[i] < minVal) {
-                    minVal = node.freqArray[i];
-                    minIndex = i;
+                boolean exists = false;
+                for (String s : updated) {
+                    if (fullWord.equals(s)) {
+                        exists = true;
+                        break;
+                    }
                 }
-            }
+                if (exists)
+                    continue;
 
-            node.suggestions[minIndex] = newWord;
-            node.freqArray[minIndex] = 1;
+                int position = 0;
+                int least = node.freqArray[0];
+
+                for (int j = 0; j < 5; j++) {
+                    if (node.freqArray[j] == 0) {
+                        position = j;
+                        break;
+                    }
+                    if (node.freqArray[j] < least) {
+                        least = node.freqArray[j];
+                        position = j;
+                    }
+                }
+
+                updated[position] = fullWord;
+                node.freqArray[position] = 1;
+
+                WordSearchFunctions.insertSuggestions(root, sub, updated);
+            }
 
             messageLabel.setText("✔ Added to library!");
             messageLabel.setVisible(true);
@@ -123,15 +144,16 @@ public class Main extends Application {
 
             suggestions.getItems().clear();
 
-            String[] updated = WordSearchFunctions.getSuggestions(root, prefix);
-            if (updated != null) {
-                for (String w : updated) {
-                    if (w != null && !w.isEmpty()) {
+            String[] updatedFinal = WordSearchFunctions.getSuggestions(root, fullWord);
+            if (updatedFinal != null) {
+                for (String w : updatedFinal) {
+                    if (w != null && !w.isEmpty())
                         suggestions.getItems().add(w);
-                    }
                 }
             }
         });
+
+
 
         VBox layout = new VBox(12);
         layout.setPadding(new Insets(20));
